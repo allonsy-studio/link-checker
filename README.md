@@ -10,7 +10,7 @@
   <img src="https://github.com/allonsy-studio/.github/blob/main/assets/tag-rule.gif" alt="" height="30" />
 </p>
 
-<p align="center"><b>Crawls a site for broken internal links, external links, & assets. Reads <code>.checklinks.config.yaml</code> by default.</b></p>
+<p align="center"><b>Crawls a site for broken internal links, external links, & assets. Reads <code>.link-checker.config.yaml</code> by default.</b></p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@allons-y/link-checker">
@@ -32,7 +32,7 @@
 
 One run covers three things that usually take two tools: same-origin pages, outbound links, & the images, media, scripts, & stylesheets those pages reference. It stays off blocklists by default: one connection per host, a configurable gap between requests, `robots.txt` honored, & `HEAD` wherever that is enough.
 
-- Zero config: drop a `.checklinks.config.yaml` next to `package.json` & run `link-checker`.
+- Zero config: drop a `.link-checker.config.yaml` next to `package.json` & run `link-checker`.
 - Crawls a live URL or serves a local build directory for the run.
 - Every broken link reports the page (or pages) it was found on.
 - Two runtime dependencies (`yaml`, `htmlparser2`); everything else is built into Node.
@@ -51,7 +51,7 @@ Requires Node 24 or later.
 ## Usage
 
 ```bash
-npx link-checker                                  # reads .checklinks.config.yaml from the current directory
+npx link-checker                                  # reads .link-checker.config.yaml from the current directory
 npx link-checker https://example.com              # a positional URL overrides the file
 npx link-checker --path ./_site --filter-level 3  # serve a local build, check scripts & stylesheets too
 npx link-checker --reporter github --strict       # CI annotations; warnings also fail the run
@@ -75,7 +75,7 @@ Exit codes: `0` no broken links, `1` broken links found, `2` configuration or st
 
 ## Configuration
 
-`.checklinks.config.yaml` (or `.yml`) in the working directory, or `--config <path>`.
+The first of `.link-checker.config.yaml`, `.link-checker.config.yml`, `.link-checker.config.json`, `.link-checker.config.js`, `.link-checker.config.mjs`, or `.link-checker.config.cjs` found in the working directory is used; the shorter `.link-checker.<ext>` is accepted too and checked after them. The older `.checklinks[.config].<ext>` names still load with a deprecation notice. `--config <path>` picks a file by its extension instead, and CLI flags override file values.
 
 ```yaml
 url: https://example.com
@@ -93,6 +93,17 @@ honorRobotExclusions: true
 maxSocketsPerHost: 1
 rateLimit: 0
 requestMethod: head
+```
+
+JavaScript configs export the same object as the default export (a function returning it, sync or async, works too):
+
+```js
+// .link-checker.config.mjs (also .js and .cjs)
+// Only the default export is read; a function export is called and awaited.
+export default {
+	url: "https://example.com",
+	excludedKeywords: ["localhost"],
+};
 ```
 
 | Key                    | Type                         | Default                           | Meaning                                                                                                             |
