@@ -19,8 +19,8 @@
   <a href="https://www.npmjs.com/package/@allons-y/link-checker">
     <img src="https://img.shields.io/npm/dw/@allons-y/link-checker.svg" alt="NPM downloads" height="20" />
   </a>
-  <a href="https://github.com/allonsy-studio/link-checker/actions/workflows/ci.yml">
-    <img src="https://github.com/allonsy-studio/link-checker/actions/workflows/ci.yml/badge.svg?branch=main" alt="Tests" height="20" />
+  <a href="https://github.com/allonsy-studio/link-checker/actions/workflows/testing.yml">
+    <img src="https://github.com/allonsy-studio/link-checker/actions/workflows/testing.yml/badge.svg?branch=main" alt="Tests" height="20" />
   </a>
   <a href="https://github.com/allonsy-studio/link-checker/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/allonsy-studio/link-checker.svg" alt="License" height="20" />
@@ -241,7 +241,7 @@ Run the suite with `checkExternal: false` so each test run stays fast and indepe
     FORCE_COLOR: 0
 ```
 
-Broken links become `::error` annotations, warnings become `::warning`, & a table lands in the job summary.
+Broken links become `::error` annotations, warnings become `::warning`, & a table lands in the job summary. For a scheduled check of a live site, copy [`examples/nightly-link-check.yml`](examples/nightly-link-check.yml) into the site's own repository.
 
 ## Contributing
 

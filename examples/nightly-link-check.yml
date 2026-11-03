@@ -1,0 +1,28 @@
+# Example: a scheduled link check for your own site, run from your site's repository.
+# Copy this file to .github/workflows/ in that repository & keep a
+# .link-checker.config.yaml (with your `url`) at its root.
+
+name: Nightly link check
+
+on:
+    schedule:
+        - cron: "17 9 * * *"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    links:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out the repository
+              uses: actions/checkout@v7
+
+            - name: Set up Node 24
+              uses: actions/setup-node@v6
+              with:
+                  node-version: "24"
+
+            - name: Check links
+              run: npx --yes @allons-y/link-checker --reporter github --reporter console
