@@ -106,6 +106,10 @@ describe("crawl", () => {
 		assert.equal(skipped.state, "skipped");
 		assert.match(skipped.reason ?? "", /keyword/);
 
+		assert.ok(summary.broken.some((r) => r.url.endsWith("/missing")));
+		assert.deepEqual(summary.broken, summary.results.filter((r) => r.state === "broken"));
+		assert.deepEqual(summary.warnings, summary.results.filter((r) => r.state === "warn"));
+
 		const seen = summary.results.map((r) => r.url);
 		assert.equal(new Set(seen).size, seen.length, "each URL is reported once");
 		assert.ok(!seen.some((u) => u.endsWith("/site.css")), "stylesheets are not checked at level 1");
