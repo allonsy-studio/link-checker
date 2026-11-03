@@ -141,6 +141,8 @@ async function main(argv: string[]): Promise<number> {
 		counts,
 		durationMs: Date.now() - started,
 		results,
+		broken: results.filter((r) => r.state === "broken"),
+		warnings: results.filter((r) => r.state === "warn"),
 	};
 	for (const reporter of reporters) await reporter.end?.(summary, config);
 	if (controller.signal.aborted) return 130;

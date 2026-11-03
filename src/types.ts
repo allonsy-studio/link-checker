@@ -68,6 +68,10 @@ export interface CheckSummary {
 	counts: Record<LinkState, number>;
 	durationMs: number;
 	results: LinkResult[];
+	/** Results in state `broken`, in emission order. */
+	broken: LinkResult[];
+	/** Results in state `warn`, in emission order. */
+	warnings: LinkResult[];
 }
 
 export interface CrawlOptions {
