@@ -1,0 +1,30 @@
+# @allons-y/link-checker configuration
+# Keys: https://github.com/allonsy-studio/link-checker#configuration
+
+url: https://allons-y.studio
+
+# URL patterns to suppress: plain substrings, not globs
+excludedKeywords:
+  - localhost
+  - stackoverflow.com
+  - codepen.io
+  - linkedin.com
+  - docs.github.com
+  - patreon.com
+  - www.npmjs.com/org/allons-y
+
+# 0 = clickable links only  1 = clickable + srcset/media (default)
+# 2 = all link-like attrs   3 = all + scripts/stylesheets
+filterLevel: 1
+
+# Respect robots.txt exclusion rules
+honorRobotExclusions: true
+
+# Maximum concurrent connections per host (default: 1)
+maxSocketsPerHost: 1
+
+# Milliseconds to wait between requests to the same host (default: 0)
+rateLimit: 0
+
+# Use HEAD requests first; falls back to GET when HEAD is refused
+requestMethod: head

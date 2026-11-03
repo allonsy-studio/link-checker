@@ -1,0 +1,86 @@
+{
+	"name": "@allons-y/link-checker",
+	"version": "0.1.0",
+	"description": "Crawls a site for broken internal links, external links, & assets. Reads .checklinks.config.yaml by default.",
+	"license": "MPL-2.0",
+	"author": "Cassondra Roberts <1840295+castastrophe@users.noreply.github.com> (https://allons-y.studio)",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/allonsy-studio/link-checker.git"
+	},
+	"bugs": {
+		"url": "https://github.com/allonsy-studio/link-checker/issues"
+	},
+	"homepage": "https://github.com/allonsy-studio/link-checker#readme",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "./dist/index.d.ts",
+	"bin": "./dist/cli.js",
+	"files": [
+		"CHANGELOG.md",
+		"LICENSE",
+		"dist"
+	],
+	"sideEffects": false,
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json",
+		"check": "node ./dist/cli.js",
+		"format": "opx lint --fix",
+		"lint": "opx lint",
+		"prepack": "yarn build",
+		"prepare": "husky",
+		"test": "node --test --test-reporter spec \"test/**/*.test.ts\"",
+		"typecheck": "tsc -p tsconfig.json --noEmit"
+	},
+	"dependencies": {
+		"htmlparser2": "^10.1.0",
+		"yaml": "^2.8.2"
+	},
+	"devDependencies": {
+		"@allons-y/opx-cli": "^0.1.0-beta.0",
+		"@allons-y/opx-lint-js": "^0.1.0-beta.0",
+		"@allons-y/opx-lint-json": "^0.1.0-beta.0",
+		"@allons-y/opx-lint-md": "^0.1.0-beta.0",
+		"@changesets/cli": "^2.29.0",
+		"@types/node": "^24.0.0",
+		"eslint": "^10.8.0",
+		"eslint-plugin-license-header": "^0.9.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^17.3.0",
+		"typescript": "^5.9.0"
+	},
+	"keywords": [
+		"broken-links",
+		"crawler",
+		"link-checker",
+		"cli",
+		"robots",
+		"accessibility"
+	],
+	"engines": {
+		"node": ">=24"
+	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": true,
+		"registry": "https://registry.npmjs.org/"
+	},
+	"funding": [
+		{
+			"type": "github",
+			"url": "https://github.com/sponsors/castastrophe"
+		}
+	],
+	"lint-staged": {
+		"*": [
+			"opx lint --fix"
+		]
+	},
+	"packageManager": "yarn@4.18.1"
+}

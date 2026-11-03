@@ -1,0 +1,15 @@
+{
+	"tabWidth": 4,
+	"useTabs": true,
+	"printWidth": 500,
+	"bracketSameLine": true,
+	"overrides": [
+		{
+			"files": ".github/**/*.yaml",
+			"options": {
+				"tabWidth": 4,
+				"useTabs": false
+			}
+		}
+	]
+}
