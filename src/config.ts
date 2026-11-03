@@ -4,7 +4,8 @@
 
 import { createRequire } from "node:module";
 import { readFile, access } from "node:fs/promises";
-import { resolve } from "node:path";
+import { extname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
@@ -14,7 +15,14 @@ const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
 
 export const VERSION: string = version;
-export const CONFIG_FILENAMES = [".checklinks.config.yaml", ".checklinks.config.yml"] as const;
+const CONFIG_EXTENSIONS = ["yaml", "yml", "json", "js", "mjs", "cjs"] as const;
+const names = (stem: string) => CONFIG_EXTENSIONS.map((ext) => `${stem}.${ext}`);
+
+/** Lookup order: `.link-checker.config.<ext>`, then `.link-checker.<ext>`; the first name that exists wins. */
+export const CONFIG_FILENAMES: readonly string[] = [...names(".link-checker.config"), ...names(".link-checker")];
+
+/** Names from the `broken-link-checker` era, still read but with a deprecation notice. */
+export const LEGACY_CONFIG_FILENAMES: readonly string[] = [...names(".checklinks.config"), ...names(".checklinks")];
 
 type SchemaType = "string" | "number" | "boolean" | "string[]" | "enum" | "map" | "level";
 
@@ -175,7 +183,7 @@ async function exists(file: string): Promise<boolean> {
 }
 
 /** Find the config file: an explicit path, or the first default name present in `cwd`. */
-export async function findConfigFile(explicit?: string, cwd: string = process.cwd()): Promise<string | undefined> {
+export async function findConfigFile(explicit?: string, cwd: string = process.cwd(), warn: (msg: string) => void = () => {}): Promise<string | undefined> {
 	if (explicit) {
 		const file = resolve(cwd, explicit);
 		if (!(await exists(file))) throw new ConfigError(`Config file not found: ${file}`);
@@ -185,11 +193,18 @@ export async function findConfigFile(explicit?: string, cwd: string = process.cw
 		const file = resolve(cwd, name);
 		if (await exists(file)) return file;
 	}
+	for (const name of LEGACY_CONFIG_FILENAMES) {
+		const file = resolve(cwd, name);
+		if (await exists(file)) {
+			warn(`\`${name}\` is a deprecated config name; rename it to \`${name.replace(".checklinks", ".link-checker")}\`.`);
+			return file;
+		}
+	}
 	return undefined;
 }
 
 export interface LoadConfigOptions {
-	/** Explicit config path; defaults to `.checklinks.config.yaml` in `cwd`. */
+	/** Explicit config path; defaults to the first of `CONFIG_FILENAMES` (then `LEGACY_CONFIG_FILENAMES`) in `cwd`. */
 	config?: string;
 	cwd?: string;
 	/** Highest-priority layer, e.g. parsed CLI flags. */
@@ -197,13 +212,37 @@ export interface LoadConfigOptions {
 	warn?: (msg: string) => void;
 }
 
-/** Read the YAML file (if any), merge overrides, and return a complete, validated config. */
+/** Parse a config file by its extension. JS files use the default export; a function default is called and awaited. */
+async function readConfigFile(file: string): Promise<unknown> {
+	switch (extname(file)) {
+		case ".yaml":
+		case ".yml":
+			return parseYaml(await readFile(file, "utf8")) ?? {};
+		case ".json":
+			try {
+				return JSON.parse(await readFile(file, "utf8"));
+			} catch (error) {
+				throw new ConfigError(`${file} is not valid JSON: ${(error as Error).message}`);
+			}
+		case ".js":
+		case ".mjs":
+		case ".cjs": {
+			const mod: Record<string, unknown> = await import(pathToFileURL(file).href);
+			const value = "default" in mod ? mod.default : mod;
+			return typeof value === "function" ? await value() : value;
+		}
+		default:
+			throw new ConfigError(`${file}: unsupported config format (use .yaml, .yml, .json, .js, .mjs, or .cjs)`);
+	}
+}
+
+/** Read the config file (if any), merge overrides, and return a complete, validated config. */
 export async function loadConfig(options: LoadConfigOptions = {}): Promise<LinkCheckerConfig> {
-	const file = await findConfigFile(options.config, options.cwd);
+	const file = await findConfigFile(options.config, options.cwd, options.warn);
 	let fromFile: LinkCheckerOptions | undefined;
 	if (file) {
-		const raw = parseYaml(await readFile(file, "utf8")) ?? {};
-		if (typeof raw !== "object" || Array.isArray(raw)) throw new ConfigError(`${file} must contain a YAML map.`);
+		const raw = await readConfigFile(file);
+		if (typeof raw !== "object" || raw === null || Array.isArray(raw)) throw new ConfigError(`${file} must contain a config object.`);
 		fromFile = normalize(raw as Record<string, unknown>, options.warn);
 	}
 	return resolveConfig(fromFile, options.overrides);

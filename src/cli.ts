@@ -47,10 +47,10 @@ function help(): string {
 		"",
 		"Usage: link-checker [url] [flags]",
 		"",
-		"Reads .checklinks.config.yaml from the current directory; flags override file values.",
+		"Reads .link-checker.config.{yaml,yml,json,js,mjs,cjs} (or .link-checker.<ext>) from the current directory; flags override file values.",
 		"",
 		"Flags:",
-		"  -c, --config <path>          Config file (default: .checklinks.config.yaml)",
+		"  -c, --config <path>          Config file (default: first .link-checker[.config].* found)",
 		"  -h, --help                   Show this help",
 		"  -v, --version                Print the version",
 	];
