@@ -31,7 +31,7 @@ export interface LinkResult {
 	durationMs: number;
 }
 
-/** Shape of `.checklinks.config.yaml`, also the options object for `check()` and `crawl()`. */
+/** Shape of `.link-checker.config.yaml`, also the options object for `check()` and `crawl()`. */
 export interface LinkCheckerConfig {
 	url?: string;
 	path?: string;

@@ -54,7 +54,7 @@ async function seedsFromSitemap(fetcher: Fetcher, base: URL, config: LinkChecker
 
 /**
  * Crawl a site and yield one `LinkResult` per unique URL as each resolves.
- * Accepts the same shape as `.checklinks.config.yaml`; missing keys take their defaults.
+ * Accepts the same shape as `.link-checker.config.yaml`; missing keys take their defaults.
  */
 export async function* crawl(options: LinkCheckerOptions, crawlOptions: CrawlOptions = {}): AsyncGenerator<LinkResult, void, undefined> {
 	const config = resolveConfig(options);

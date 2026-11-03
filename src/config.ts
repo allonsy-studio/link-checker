@@ -16,12 +16,13 @@ const { version } = require("../package.json") as { version: string };
 
 export const VERSION: string = version;
 const CONFIG_EXTENSIONS = ["yaml", "yml", "json", "js", "mjs", "cjs"] as const;
+const names = (stem: string) => CONFIG_EXTENSIONS.map((ext) => `${stem}.${ext}`);
 
-/** Lookup order: `.checklinks.config.<ext>` first, then the shorter `.checklinks.<ext>`; the first name that exists wins. */
-export const CONFIG_FILENAMES: readonly string[] = [
-	...CONFIG_EXTENSIONS.map((ext) => `.checklinks.config.${ext}`),
-	...CONFIG_EXTENSIONS.map((ext) => `.checklinks.${ext}`),
-];
+/** Lookup order: `.link-checker.config.<ext>`, then `.link-checker.<ext>`; the first name that exists wins. */
+export const CONFIG_FILENAMES: readonly string[] = [...names(".link-checker.config"), ...names(".link-checker")];
+
+/** Names from the `broken-link-checker` era, still read but with a deprecation notice. */
+export const LEGACY_CONFIG_FILENAMES: readonly string[] = [...names(".checklinks.config"), ...names(".checklinks")];
 
 type SchemaType = "string" | "number" | "boolean" | "string[]" | "enum" | "map" | "level";
 
@@ -182,7 +183,7 @@ async function exists(file: string): Promise<boolean> {
 }
 
 /** Find the config file: an explicit path, or the first default name present in `cwd`. */
-export async function findConfigFile(explicit?: string, cwd: string = process.cwd()): Promise<string | undefined> {
+export async function findConfigFile(explicit?: string, cwd: string = process.cwd(), warn: (msg: string) => void = () => {}): Promise<string | undefined> {
 	if (explicit) {
 		const file = resolve(cwd, explicit);
 		if (!(await exists(file))) throw new ConfigError(`Config file not found: ${file}`);
@@ -192,11 +193,18 @@ export async function findConfigFile(explicit?: string, cwd: string = process.cw
 		const file = resolve(cwd, name);
 		if (await exists(file)) return file;
 	}
+	for (const name of LEGACY_CONFIG_FILENAMES) {
+		const file = resolve(cwd, name);
+		if (await exists(file)) {
+			warn(`\`${name}\` is a deprecated config name; rename it to \`${name.replace(".checklinks", ".link-checker")}\`.`);
+			return file;
+		}
+	}
 	return undefined;
 }
 
 export interface LoadConfigOptions {
-	/** Explicit config path; defaults to the first of `CONFIG_FILENAMES` in `cwd`. */
+	/** Explicit config path; defaults to the first of `CONFIG_FILENAMES` (then `LEGACY_CONFIG_FILENAMES`) in `cwd`. */
 	config?: string;
 	cwd?: string;
 	/** Highest-priority layer, e.g. parsed CLI flags. */
@@ -230,7 +238,7 @@ async function readConfigFile(file: string): Promise<unknown> {
 
 /** Read the config file (if any), merge overrides, and return a complete, validated config. */
 export async function loadConfig(options: LoadConfigOptions = {}): Promise<LinkCheckerConfig> {
-	const file = await findConfigFile(options.config, options.cwd);
+	const file = await findConfigFile(options.config, options.cwd, options.warn);
 	let fromFile: LinkCheckerOptions | undefined;
 	if (file) {
 		const raw = await readConfigFile(file);
