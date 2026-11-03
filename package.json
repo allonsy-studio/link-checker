@@ -18,6 +18,10 @@
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
 		},
+		"./cypress": {
+			"types": "./dist/cypress.d.ts",
+			"default": "./dist/cypress.js"
+		},
 		"./package.json": "./package.json"
 	},
 	"types": "./dist/index.d.ts",

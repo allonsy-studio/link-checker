@@ -165,6 +165,63 @@ interface LinkResult {
 }
 ```
 
+## Inside a test suite
+
+`summary.broken` & `summary.warnings` hold the matching results, and `formatResults()` turns a list into plain text for an assertion message.
+
+With node:test:
+
+```js
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { check, formatResults } from "@allons-y/link-checker";
+
+test("the built site has no broken links", async () => {
+	const summary = await check({ path: "./_site", checkExternal: false });
+	assert.equal(summary.broken.length, 0, formatResults(summary.broken));
+});
+```
+
+With Vitest:
+
+```js
+import { expect, it } from "vitest";
+import { check, formatResults } from "@allons-y/link-checker";
+
+it("has no broken links", async () => {
+	const summary = await check({ path: "./_site", checkExternal: false });
+	expect(summary.broken, formatResults(summary.broken)).toEqual([]);
+});
+```
+
+With Cypress, register the task once in `cypress.config.js`:
+
+```js
+import { defineConfig } from "cypress";
+import { registerLinkChecker } from "@allons-y/link-checker/cypress";
+
+export default defineConfig({
+	e2e: {
+		baseUrl: "http://localhost:8080",
+		setupNodeEvents(on) {
+			registerLinkChecker(on, { checkExternal: false });
+		},
+	},
+});
+```
+
+Then call it from a spec. Specs run in the browser, so they cannot import `formatResults`; the message here lists the broken URLs instead:
+
+```js
+it("has no broken links", () => {
+	cy.task("checkLinks", { url: Cypress.config("baseUrl") }).then((summary) => {
+		expect(summary.broken, summary.broken.map((r) => r.url).join("\n")).to.be.empty;
+	});
+});
+```
+
+Run the suite with `checkExternal: false` so each test run stays fast and independent of other sites, and run the full crawl, external links included, in a scheduled job. The package is ESM-only, so Jest needs `--experimental-vm-modules`, while Vitest, node:test, & ava work as is.
+
 ## GitHub Actions
 
 ```yaml

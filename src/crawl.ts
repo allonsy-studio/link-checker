@@ -78,12 +78,16 @@ export async function check(options: LinkCheckerOptions, crawlOptions: CrawlOpti
 	const started = Date.now();
 	const results: LinkResult[] = [];
 	const counts: Record<LinkState, number> = { ok: 0, warn: 0, broken: 0, skipped: 0 };
+	const broken: LinkResult[] = [];
+	const warnings: LinkResult[] = [];
 	for await (const result of crawl(config, crawlOptions)) {
 		results.push(result);
 		counts[result.state] += 1;
+		if (result.state === "broken") broken.push(result);
+		if (result.state === "warn") warnings.push(result);
 	}
 	const passed = counts.broken === 0 && (!config.strict || counts.warn === 0);
-	return { passed, counts, durationMs: Date.now() - started, results };
+	return { passed, counts, durationMs: Date.now() - started, results, broken, warnings };
 }
 
 async function run(config: LinkCheckerConfig, out: AsyncQueue<LinkResult>, crawlOptions: CrawlOptions): Promise<void> {

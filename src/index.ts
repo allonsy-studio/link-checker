@@ -3,6 +3,7 @@
  */
 
 export { check, crawl } from "./crawl.ts";
+export { formatResults } from "./format.ts";
 export { CONFIG_FILENAMES, ConfigError, SCHEMA, VERSION, defaults, findConfigFile, loadConfig, normalize, resolveConfig } from "./config.ts";
 export { parseCss, parseHtml, RULES } from "./parser.ts";
 export { RobotsRules } from "./robots.ts";
