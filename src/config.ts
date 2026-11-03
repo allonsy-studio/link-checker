@@ -4,7 +4,8 @@
 
 import { createRequire } from "node:module";
 import { readFile, access } from "node:fs/promises";
-import { resolve } from "node:path";
+import { extname, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
@@ -14,7 +15,15 @@ const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
 
 export const VERSION: string = version;
-export const CONFIG_FILENAMES = [".checklinks.config.yaml", ".checklinks.config.yml"] as const;
+/** Lookup order: the first name that exists in the working directory wins. */
+export const CONFIG_FILENAMES = [
+	".checklinks.config.yaml",
+	".checklinks.config.yml",
+	".checklinks.config.json",
+	".checklinks.config.js",
+	".checklinks.config.mjs",
+	".checklinks.config.cjs",
+] as const;
 
 type SchemaType = "string" | "number" | "boolean" | "string[]" | "enum" | "map" | "level";
 
@@ -189,7 +198,7 @@ export async function findConfigFile(explicit?: string, cwd: string = process.cw
 }
 
 export interface LoadConfigOptions {
-	/** Explicit config path; defaults to `.checklinks.config.yaml` in `cwd`. */
+	/** Explicit config path; defaults to the first of `CONFIG_FILENAMES` in `cwd`. */
 	config?: string;
 	cwd?: string;
 	/** Highest-priority layer, e.g. parsed CLI flags. */
@@ -197,13 +206,37 @@ export interface LoadConfigOptions {
 	warn?: (msg: string) => void;
 }
 
-/** Read the YAML file (if any), merge overrides, and return a complete, validated config. */
+/** Parse a config file by its extension. JS files use the default export; a function default is called and awaited. */
+async function readConfigFile(file: string): Promise<unknown> {
+	switch (extname(file)) {
+		case ".yaml":
+		case ".yml":
+			return parseYaml(await readFile(file, "utf8")) ?? {};
+		case ".json":
+			try {
+				return JSON.parse(await readFile(file, "utf8"));
+			} catch (error) {
+				throw new ConfigError(`${file} is not valid JSON: ${(error as Error).message}`);
+			}
+		case ".js":
+		case ".mjs":
+		case ".cjs": {
+			const mod: Record<string, unknown> = await import(pathToFileURL(file).href);
+			const value = "default" in mod ? mod.default : mod;
+			return typeof value === "function" ? await value() : value;
+		}
+		default:
+			throw new ConfigError(`${file}: unsupported config format (use .yaml, .yml, .json, .js, .mjs, or .cjs)`);
+	}
+}
+
+/** Read the config file (if any), merge overrides, and return a complete, validated config. */
 export async function loadConfig(options: LoadConfigOptions = {}): Promise<LinkCheckerConfig> {
 	const file = await findConfigFile(options.config, options.cwd);
 	let fromFile: LinkCheckerOptions | undefined;
 	if (file) {
-		const raw = parseYaml(await readFile(file, "utf8")) ?? {};
-		if (typeof raw !== "object" || Array.isArray(raw)) throw new ConfigError(`${file} must contain a YAML map.`);
+		const raw = await readConfigFile(file);
+		if (typeof raw !== "object" || raw === null || Array.isArray(raw)) throw new ConfigError(`${file} must contain a config object.`);
 		fromFile = normalize(raw as Record<string, unknown>, options.warn);
 	}
 	return resolveConfig(fromFile, options.overrides);

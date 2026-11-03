@@ -64,7 +64,7 @@ Exit codes: `0` no broken links, `1` broken links found, `2` configuration or st
 
 ## Configuration
 
-`.checklinks.config.yaml` (or `.yml`) in the working directory, or `--config <path>`.
+The first of `.checklinks.config.yaml`, `.checklinks.config.yml`, `.checklinks.config.json`, `.checklinks.config.js`, `.checklinks.config.mjs`, or `.checklinks.config.cjs` found in the working directory is used; `--config <path>` picks a file by its extension instead, and CLI flags override file values.
 
 ```yaml
 url: https://example.com
@@ -82,6 +82,17 @@ honorRobotExclusions: true
 maxSocketsPerHost: 1
 rateLimit: 0
 requestMethod: head
+```
+
+JavaScript configs export the same object as the default export (a function returning it, sync or async, works too):
+
+```js
+// .checklinks.config.mjs (also .js and .cjs)
+// Only the default export is read; a function export is called and awaited.
+export default {
+	url: "https://example.com",
+	excludedKeywords: ["localhost"],
+};
 ```
 
 | Key                    | Type                         | Default                           | Meaning                                                                                                             |
