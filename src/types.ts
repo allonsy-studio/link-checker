@@ -35,6 +35,7 @@ export interface LinkResult {
 export interface LinkCheckerConfig {
 	url?: string;
 	path?: string;
+	markdown: string[];
 	excludedKeywords: string[];
 	excludedPatterns: string[];
 	filterLevel: FilterLevel;

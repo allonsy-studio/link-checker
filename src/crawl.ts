@@ -6,6 +6,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 
 import { resolveConfig } from "./config.ts";
 import { Fetcher, type FetchOutcome } from "./fetcher.ts";
+import { discoverMarkdown } from "./markdown.ts";
 import { parseCss, parseHtml } from "./parser.ts";
 import { RobotsCache } from "./robots.ts";
 import { AsyncQueue, Scheduler, Signal, type Task } from "./scheduler.ts";
@@ -90,8 +91,10 @@ async function run(config: LinkCheckerConfig, out: AsyncQueue<LinkResult>, crawl
 	const { signal } = crawlOptions;
 	const server = config.path ? await serveDirectory(config.path) : undefined;
 	try {
-		const base = new URL(config.url ?? server!.url);
-		crawlOptions.onStart?.(base.href);
+		const startUrl = config.url ?? server?.url;
+		// Markdown-only runs have no site to start from; the placeholder keeps URL resolution total.
+		const base = new URL(startUrl ?? "http://markdown.invalid/");
+		if (startUrl) crawlOptions.onStart?.(base.href);
 
 		const fetcher = new Fetcher(config);
 		const robots = new RobotsCache((url) => fetcher.getText(url, signal), config.userAgent);
@@ -111,7 +114,7 @@ async function run(config: LinkCheckerConfig, out: AsyncQueue<LinkResult>, crawl
 		const skip = (task: Task, reason: string) => emit(task, { state: "skipped", reason, redirects: [], attempts: 0, durationMs: 0 });
 
 		const discover = (link: DiscoveredLink, parent: string | undefined, depth: number) => {
-			const url = resolveLink(link.url, parent ?? base.href);
+			const url = resolveLink(link.url, parent && /^https?:/i.test(parent) ? parent : base.href);
 			if (!url) return;
 			const key = normalizeUrl(url);
 			const internal = isSameOrigin(url, base);
@@ -189,8 +192,16 @@ async function run(config: LinkCheckerConfig, out: AsyncQueue<LinkResult>, crawl
 		};
 
 		// Seeds: the start URL, plus sitemap entries when configured.
-		discover({ url: base.href, original: base.href, kind: "link", tag: "seed", attr: "" }, undefined, 0);
-		if (config.sitemap) {
+		if (startUrl) discover({ url: base.href, original: base.href, kind: "link", tag: "seed", attr: "" }, undefined, 0);
+		await discoverMarkdown(
+			config,
+			(link, parent) => discover(link, parent, 1),
+			(url, parent, reason) =>
+				out.push({ url, original: url, state: "skipped", reason, redirects: [], parents: [parent], kind: "link", internal: false, attempts: 0, durationMs: 0 }),
+			(result) => out.push(result),
+			{ base: startUrl ? base : undefined },
+		);
+		if (startUrl && config.sitemap) {
 			for (const loc of await seedsFromSitemap(fetcher, base, config, signal)) {
 				discover({ url: loc, original: loc, kind: "link", tag: "sitemap", attr: "loc" }, undefined, 0);
 			}

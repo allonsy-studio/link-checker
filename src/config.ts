@@ -31,6 +31,7 @@ export interface SchemaEntry {
 export const SCHEMA: Record<keyof LinkCheckerConfig, SchemaEntry> = {
 	url: { type: "string", default: undefined, description: "Live site to crawl (required unless path is set)" },
 	path: { type: "string", default: undefined, description: "Local build directory, served on a random port for the run" },
+	markdown: { type: "string[]", default: [], description: "Globs of Markdown source files to check, relative to the working directory" },
 	excludedKeywords: { type: "string[]", default: [], description: "Plain substrings; a URL containing one is skipped" },
 	excludedPatterns: { type: "string[]", default: [], description: "Regular expressions; a URL matching one is skipped" },
 	filterLevel: { type: "level", default: 1, description: "0 clickable links, 1 + media, 2 + all link-like attributes, 3 + scripts and stylesheets" },
@@ -138,7 +139,7 @@ export function normalize(input: Record<string, unknown>, warn: (msg: string) =>
 /** Merge layers left to right, validate the result, and apply cross-key rules. */
 export function resolveConfig(...layers: Array<LinkCheckerOptions | undefined>): LinkCheckerConfig {
 	const merged: LinkCheckerConfig = Object.assign(defaults(), ...layers.filter(Boolean));
-	if (!merged.url && !merged.path) throw new ConfigError("Config must define `url` or `path`.");
+	if (!merged.url && !merged.path && merged.markdown.length === 0) throw new ConfigError("Config must define `url` or `path`.");
 	if (merged.url && merged.path) throw new ConfigError("`url` and `path` are mutually exclusive.");
 	if (merged.url) {
 		let parsed: URL;
