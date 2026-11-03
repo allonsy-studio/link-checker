@@ -39,7 +39,7 @@
 		"lint": "opx lint",
 		"prepack": "yarn build",
 		"prepare": "husky",
-		"test": "node --test --test-reporter spec \"test/**/*.test.ts\"",
+		"test": "yarn build && node --test --test-reporter spec \"test/**/*.test.ts\"",
 		"typecheck": "tsc -p tsconfig.json --noEmit"
 	},
 	"dependencies": {

@@ -247,7 +247,7 @@ Broken links become `::error` annotations, warnings become `::warning`, & a tabl
 
 ```bash
 yarn install
-yarn test        # node:test against local fixture servers; no network
+yarn test        # builds, then node:test against local fixture servers; no network
 yarn lint        # opx: ESLint, JSON, Markdown
 yarn typecheck
 yarn build       # tsc → dist/
