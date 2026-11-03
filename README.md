@@ -64,7 +64,7 @@ Exit codes: `0` no broken links, `1` broken links found, `2` configuration or st
 
 ## Configuration
 
-The first of `.checklinks.config.yaml`, `.checklinks.config.yml`, `.checklinks.config.json`, `.checklinks.config.js`, `.checklinks.config.mjs`, or `.checklinks.config.cjs` found in the working directory is used; `--config <path>` picks a file by its extension instead, and CLI flags override file values.
+The first of `.checklinks.config.yaml`, `.checklinks.config.yml`, `.checklinks.config.json`, `.checklinks.config.js`, `.checklinks.config.mjs`, or `.checklinks.config.cjs` found in the working directory is used; the shorter `.checklinks.yaml` (& the same five other extensions) is accepted too and checked after them. `--config <path>` picks a file by its extension instead, and CLI flags override file values.
 
 ```yaml
 url: https://example.com

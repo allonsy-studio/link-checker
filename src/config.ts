@@ -15,15 +15,13 @@ const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
 
 export const VERSION: string = version;
-/** Lookup order: the first name that exists in the working directory wins. */
-export const CONFIG_FILENAMES = [
-	".checklinks.config.yaml",
-	".checklinks.config.yml",
-	".checklinks.config.json",
-	".checklinks.config.js",
-	".checklinks.config.mjs",
-	".checklinks.config.cjs",
-] as const;
+const CONFIG_EXTENSIONS = ["yaml", "yml", "json", "js", "mjs", "cjs"] as const;
+
+/** Lookup order: `.checklinks.config.<ext>` first, then the shorter `.checklinks.<ext>`; the first name that exists wins. */
+export const CONFIG_FILENAMES: readonly string[] = [
+	...CONFIG_EXTENSIONS.map((ext) => `.checklinks.config.${ext}`),
+	...CONFIG_EXTENSIONS.map((ext) => `.checklinks.${ext}`),
+];
 
 type SchemaType = "string" | "number" | "boolean" | "string[]" | "enum" | "map" | "level";
 

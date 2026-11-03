@@ -56,6 +56,14 @@ describe("config", () => {
 		assert.equal(config.url, "https://yaml.test");
 	});
 
+	it("accepts the shorter .checklinks.<ext> name after the .config form", async () => {
+		const dir = await mkdtemp(join(tmpdir(), "lc-"));
+		await writeFile(join(dir, ".checklinks.yml"), "url: https://short.test\n");
+		assert.equal(await findConfigFile(undefined, dir), join(dir, ".checklinks.yml"));
+		await writeFile(join(dir, ".checklinks.config.json"), JSON.stringify({ url: "https://long.test" }));
+		assert.equal(await findConfigFile(undefined, dir), join(dir, ".checklinks.config.json"), ".config names win over short names");
+	});
+
 	it("loads a JSON config", async () => {
 		const dir = await mkdtemp(join(tmpdir(), "lc-"));
 		await writeFile(join(dir, ".checklinks.config.json"), JSON.stringify({ url: "https://json.test", excludedKeywords: ["localhost"], retries: 4 }));
