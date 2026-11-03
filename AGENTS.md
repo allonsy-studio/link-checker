@@ -66,4 +66,4 @@ Follow the studio rules in [AGENTS.md](https://github.com/allonsy-studio/.github
 
 ## Running against a site
 
-The CLI checks whatever `url` (or `path`) the configuration provides; nothing in this repository is tied to a particular site. `.link-checker.config.yaml` at the root is a sample configuration for manual smoke checks (`node dist/cli.js`); override its target with a positional URL or `--path <build dir>` to run against something else. No workflow in this repository runs against a live site. `examples/nightly-link-check.yml` is a copyable workflow for a site's own repository.
+The CLI checks whatever `url` (or `path`) the configuration provides. `.link-checker.config.yaml` at the root is a sample configuration for manual smoke checks (`node dist/cli.js`); override its target with a positional URL or `--path <build dir>` to run against something else. No workflow in this repository runs against a live site. `examples/nightly-link-check.yml` is a copyable workflow for a site's own repository.
