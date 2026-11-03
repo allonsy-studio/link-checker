@@ -56,7 +56,7 @@ describe("config", () => {
 		assert.equal(config.url, "https://yaml.test");
 	});
 
-	it("accepts the shorter .checklinks.<ext> name after the .config form", async () => {
+	it("accepts the shorter .link-checker.<ext> name after the .config form", async () => {
 		const dir = await mkdtemp(join(tmpdir(), "lc-"));
 		await writeFile(join(dir, ".link-checker.yml"), "url: https://short.test\n");
 		assert.equal(await findConfigFile(undefined, dir), join(dir, ".link-checker.yml"));
@@ -107,7 +107,7 @@ describe("config", () => {
 
 	it("rejects a config file with an unknown extension", async () => {
 		const dir = await mkdtemp(join(tmpdir(), "lc-"));
-		const file = join(dir, "checklinks.toml");
+		const file = join(dir, "link-checker.toml");
 		await writeFile(file, "url = \"https://toml.test\"\n");
 		await assert.rejects(loadConfig({ cwd: dir, config: file }), (error: unknown) => error instanceof ConfigError && /unsupported config format/.test(error.message));
 	});
