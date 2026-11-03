@@ -66,4 +66,4 @@ Follow the studio rules in [AGENTS.md](https://github.com/allonsy-studio/.github
 
 ## Running against a site
 
-`.link-checker.config.yaml` at the repository root targets `https://allons-y.studio`. Run `node dist/cli.js` from the root for a quick check of that site. For anything heavier, build the target site locally and pass `--path` to serve the build directory, so the run does not load the live site.
+`.link-checker.config.yaml` at the repository root targets `https://allons-y.studio` for manual smoke checks (`node dist/cli.js`); no workflow in this repository runs against a live site. `examples/nightly-link-check.yml` is a copyable workflow for a site's own repository. For anything heavier, build the target site locally and pass `--path` to serve the build directory.

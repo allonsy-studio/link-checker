@@ -1,3 +1,7 @@
+# Example: a scheduled link check for your own site, run from your site's repository.
+# Copy this file to .github/workflows/ in that repository & keep a
+# .link-checker.config.yaml (with your `url`) at its root.
+
 name: Nightly link check
 
 on:
@@ -15,17 +19,10 @@ jobs:
             - name: Check out the repository
               uses: actions/checkout@v6
 
-            - name: Enable Corepack
-              run: corepack enable
-
             - name: Set up Node 24
               uses: actions/setup-node@v7
               with:
                   node-version: "24"
-                  cache: yarn
 
-            - name: Install dependencies and build
-              run: yarn install --immutable && yarn build
-
-            - name: Check links on allons-y.studio
-              run: node dist/cli.js --reporter github --reporter console
+            - name: Check links
+              run: npx --yes @allons-y/link-checker --reporter github --reporter console

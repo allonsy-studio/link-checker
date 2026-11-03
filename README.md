@@ -241,7 +241,7 @@ Run the suite with `checkExternal: false` so each test run stays fast and indepe
     FORCE_COLOR: 0
 ```
 
-Broken links become `::error` annotations, warnings become `::warning`, & a table lands in the job summary.
+Broken links become `::error` annotations, warnings become `::warning`, & a table lands in the job summary. For a scheduled check of a live site, copy [`examples/nightly-link-check.yml`](examples/nightly-link-check.yml) into the site's own repository.
 
 ## Contributing
 
