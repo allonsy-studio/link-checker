@@ -59,6 +59,8 @@ Guidance for coding agents working in this repository.
 
 Follow the studio rules in [AGENTS.md](https://github.com/allonsy-studio/.github/blob/main/AGENTS.md). In short:
 
+- Use [Conventional Commits](https://www.conventionalcommits.org/) for commit and PR titles: `type(scope): short summary`, with `feat`, `fix`, `docs`, `test`, `refactor`, or `chore`; `!` or a `BREAKING CHANGE:` footer marks a major change.
+- Branch names follow the same types: `feat/short-description`, `fix/short-description`, `docs/short-description`.
 - Write pronoun-free titles and bodies. Avoid "I", "we", and "our".
 - Add no AI attribution of any kind: no `Co-Authored-By` trailer, no "Generated with" footer, no session links.
 - Work on a feature branch and squash merge into `main`.
