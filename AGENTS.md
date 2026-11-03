@@ -4,7 +4,7 @@ Guidance for coding agents working in this repository.
 
 ## What this package is
 
-`@allons-y/link-checker` is a CLI and library that crawls a site for broken internal links, external links, and assets. It reads `.checklinks.config.yaml` by default and reports results to the console, as JSON, or as GitHub Actions annotations.
+`@allons-y/link-checker` is a CLI and library that crawls a site for broken internal links, external links, and assets. It reads `.link-checker.config.yaml` by default and reports results to the console, as JSON, or as GitHub Actions annotations.
 
 ## Stack
 
@@ -66,4 +66,4 @@ Follow the studio rules in [AGENTS.md](https://github.com/allonsy-studio/.github
 
 ## Running against a site
 
-`.checklinks.config.yaml` at the repository root targets `https://allons-y.studio`. Run `node dist/cli.js` from the root for a quick check of that site. For anything heavier, build the target site locally and pass `--path` to serve the build directory, so the run does not load the live site.
+`.link-checker.config.yaml` at the repository root targets `https://allons-y.studio`. Run `node dist/cli.js` from the root for a quick check of that site. For anything heavier, build the target site locally and pass `--path` to serve the build directory, so the run does not load the live site.
