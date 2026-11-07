@@ -60,6 +60,17 @@ npx link-checker --reporter json --output links.json
 
 Every config key below has a flag of the same name in kebab-case (`--max-sockets-per-host 2`). Boolean keys take `--no-` for false (`--no-check-external`). `--help` prints the full list.
 
+### Markdown sources
+
+For Eleventy & similar projects whose content lives in `.md` files, list globs under `markdown`. Links, images, reference definitions, autolinks, & raw HTML `href`/`src` are read from each file (code blocks & code spans are ignored). Web links are checked like any crawled link, with `file:line` as the parent. Relative links such as `./other.md` or `../img/x.png` are checked on disk, & with `checkFragments` a `#heading` on a Markdown target must exist. Root-relative links like `/about/` resolve against `url` or `path`; without either they are skipped. `url` & `path` are optional when `markdown` is set.
+
+```yaml
+markdown:
+  - src/**/*.md
+path: _site # optional: resolves /root-relative links
+checkFragments: true
+```
+
 Exit codes: `0` no broken links, `1` broken links found, `2` configuration or startup error.
 
 ## Configuration
@@ -99,6 +110,7 @@ export default {
 | ---------------------- | ---------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `url`                  | string                       | required unless `path` is set     | Live site to crawl                                                                                                  |
 | `path`                 | string                       |                                   | Local build directory, served on a random port with clean URLs (`/about` → `/about/index.html` or `/about.html`)   |
+| `markdown`             | string[]                     | `[]`                              | Globs of Markdown source files to check, relative to the working directory (`url` & `path` become optional)        |
 | `excludedKeywords`     | string[]                     | `[]`                              | Plain substrings; a URL containing one is skipped                                                                   |
 | `excludedPatterns`     | string[]                     | `[]`                              | Regular expressions for what substrings can't express                                                               |
 | `filterLevel`          | 0–3                          | `1`                               | Which elements to scan (see below)                                                                                  |
