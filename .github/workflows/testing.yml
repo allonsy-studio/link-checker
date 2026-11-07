@@ -8,10 +8,12 @@ on:
 
 jobs:
     test:
+        name: CI (node${{ matrix.node }})
         runs-on: ubuntu-latest
         strategy:
+            fail-fast: false
             matrix:
-                node: ["24", "lts/*"]
+                node: [26, 24]
         steps:
             - name: Check out the repository
               uses: actions/checkout@v7
