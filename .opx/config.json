@@ -7,6 +7,6 @@
 		"md": "./eslint.config.js",
 		"ts": "./eslint.config.js"
 	},
-	"release": false,
+	"release": true,
 	"test": false
 }
