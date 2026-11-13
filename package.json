@@ -47,10 +47,11 @@
 		"yaml": "^2.8.2"
 	},
 	"devDependencies": {
-		"@allons-y/opx-cli": "^0.1.0-beta.0",
-		"@allons-y/opx-lint-js": "^0.1.0-beta.0",
-		"@allons-y/opx-lint-json": "^0.1.0-beta.0",
-		"@allons-y/opx-lint-md": "^0.1.0-beta.0",
+		"@allons-y/opx-cli": "^0.2.0",
+		"@allons-y/opx-lint-js": "^1.0.0",
+		"@allons-y/opx-lint-json": "^0.1.0",
+		"@allons-y/opx-lint-md": "^0.1.0",
+		"@allons-y/opx-lint-ts": "^0.1.0",
 		"@changesets/cli": "^2.29.0",
 		"@types/node": "^24.0.0",
 		"eslint": "^10.8.0",

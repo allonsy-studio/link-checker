@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+( if [ -f .pnp.cjs ]; then yarn opx hook post-commit; else PATH="node_modules/.bin:$PATH" opx hook post-commit; fi >/dev/null 2>&1 & ) || true
+exit 0
