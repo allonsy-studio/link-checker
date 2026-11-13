@@ -1,6 +1,11 @@
 {
 	"$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-	"changelog": "@changesets/cli/changelog",
+	"changelog": [
+		"@allons-y/opx-release/changelog",
+		{
+			"repo": "allonsy-studio/link-checker"
+		}
+	],
 	"commit": false,
 	"access": "public",
 	"baseBranch": "main",
