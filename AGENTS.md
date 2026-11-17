@@ -63,7 +63,7 @@ Follow the studio rules in [AGENTS.md](https://github.com/allonsy-studio/.github
 - Branch names follow the same types: `feat/short-description`, `fix/short-description`, `docs/short-description`.
 - Write pronoun-free titles and bodies. Avoid "I", "we", and "our".
 - Add no AI attribution of any kind: no `Co-Authored-By` trailer, no "Generated with" footer, no session links.
-- Work on a feature branch and squash merge into `main`.
+- Work on a feature branch and squash merge into `main`: the PR title becomes the commit subject & the commit messages its body, so the title must be a valid Conventional Commits subject.
 - Keep PR descriptions to one to three sentences, leading with a verb.
 
 ## Running against a site
